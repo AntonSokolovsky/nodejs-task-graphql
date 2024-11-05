@@ -1,4 +1,9 @@
-import { GraphQLBoolean, GraphQLObjectType } from 'graphql';
+import {
+  GraphQLBoolean,
+  GraphQLNonNull,
+  GraphQLObjectType,
+  GraphQLString,
+} from 'graphql';
 import { ChangeUserInput, CreateUserInput, UserInput, User } from './types/user.js';
 import { UUIDType } from './types/uuid.js';
 import {
@@ -8,7 +13,7 @@ import {
   Profile,
 } from './types/profile.js';
 import { ChangePostInput, CreatePostInput, PostInput, Post } from './types/post.js';
-import { ContextType } from './dataLoader.js';
+import { ContextType, userDL } from './dataLoader.js';
 
 export const mutation = new GraphQLObjectType({
   name: 'Mutation',
@@ -127,10 +132,10 @@ export const mutation = new GraphQLObjectType({
       },
     },
     subscribeTo: {
-      type: User,
+      type: new GraphQLNonNull(GraphQLString),
       args: {
-        userId: { type: UUIDType },
-        authorId: { type: UUIDType },
+        userId: { type: new GraphQLNonNull(UUIDType) },
+        authorId: { type: new GraphQLNonNull(UUIDType) },
       },
       resolve: async (
         _parent,
@@ -143,8 +148,7 @@ export const mutation = new GraphQLObjectType({
             authorId: args.authorId,
           },
         });
-        const user = prisma.user.findUnique({ where: { id: args.userId } });
-        return user;
+        return `User:${args.userId} subscribed to author:${args.authorId}!`;
       },
     },
     unsubscribeFrom: {
