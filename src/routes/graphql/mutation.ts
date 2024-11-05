@@ -1,6 +1,5 @@
 import { GraphQLBoolean, GraphQLObjectType } from 'graphql';
 import { ChangeUserInput, CreateUserInput, UserInput, User } from './types/user.js';
-import { PrismaClient } from '@prisma/client';
 import { UUIDType } from './types/uuid.js';
 import {
   ChangeProfileInput,
@@ -154,11 +153,11 @@ export const mutation = new GraphQLObjectType({
         userId: { type: UUIDType },
         authorId: { type: UUIDType },
       },
-      async resolve(
-        _source,
+      resolve: async (
+        _parent,
         args: { userId: string; authorId: string },
-        { prisma }: { prisma: PrismaClient },
-      ) {
+        { prisma }: ContextType,
+      ) => {
         try {
           await prisma.subscribersOnAuthors.deleteMany({
             where: {
