@@ -11,11 +11,16 @@ import { PrismaClient } from '@prisma/client';
 import { Profile } from './profile.js';
 import { Post } from './post.js';
 
-interface IUser {
+export interface IUser {
   id: string;
   name: string;
   balance: number;
 }
+
+export type UserInput = {
+  name: string;
+  balance: number;
+};
 
 export const User: GraphQLObjectType = new GraphQLObjectType({
   name: 'User',
@@ -64,4 +69,20 @@ export const User: GraphQLObjectType = new GraphQLObjectType({
       },
     },
   }),
+});
+
+export const CreateUserInput = new GraphQLInputObjectType({
+  name: 'CreateUserInput',
+  fields: {
+    name: { type: new GraphQLNonNull(GraphQLString) },
+    balance: { type: new GraphQLNonNull(GraphQLFloat) },
+  },
+});
+
+export const ChangeUserInput = new GraphQLInputObjectType({
+  name: 'ChangeUserInput',
+  fields: {
+    name: { type: GraphQLString },
+    balance: { type: GraphQLFloat },
+  },
 });

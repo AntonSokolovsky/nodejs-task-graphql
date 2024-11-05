@@ -5,6 +5,7 @@ import { IMember, MemberType, MemberTypeIdEnum } from './types/member.js';
 import { PrismaClient } from '@prisma/client';
 import { Post } from './types/post.js';
 import { IProfile, Profile } from './types/profile.js';
+import { mutation } from './mutation.js';
 
 const query = new GraphQLObjectType({
   name: 'Query',
@@ -72,4 +73,4 @@ const query = new GraphQLObjectType({
   },
 });
 
-export const schema = new GraphQLSchema({ query });
+export const schema = new GraphQLSchema({ query, mutation });

@@ -8,15 +8,22 @@ import {
 import { UUIDType } from './uuid.js';
 import { User } from './user.js';
 import { PrismaClient } from '@prisma/client';
-import { MemberType, MemberTypeId, MemberTypeIdEnum } from './member.js';
+import { MemberType, MemberTypeIdEnum } from './member.js';
 
 export interface IProfile {
   id: string;
   isMale: boolean;
   yearOfBirth: number;
-  memberTypeId: MemberTypeId;
+  memberTypeId: string;
   userId: string;
 }
+
+export type ProfileInput = {
+  isMale: boolean;
+  yearOfBirth: number;
+  memberTypeId: string;
+  userId: string;
+};
 
 export const Profile: GraphQLObjectType = new GraphQLObjectType({
   name: 'Profile',
@@ -39,4 +46,23 @@ export const Profile: GraphQLObjectType = new GraphQLObjectType({
       },
     },
   }),
+});
+
+export const CreateProfileInput = new GraphQLInputObjectType({
+  name: 'CreateProfileInput',
+  fields: {
+    isMale: { type: GraphQLBoolean },
+    yearOfBirth: { type: GraphQLInt },
+    memberTypeId: { type: MemberTypeIdEnum },
+    userId: { type: new GraphQLNonNull(UUIDType) },
+  },
+});
+
+export const ChangeProfileInput = new GraphQLInputObjectType({
+  name: 'ChangeProfileInput',
+  fields: {
+    isMale: { type: GraphQLBoolean },
+    yearOfBirth: { type: GraphQLInt },
+    memberTypeId: { type: MemberTypeIdEnum },
+  },
 });

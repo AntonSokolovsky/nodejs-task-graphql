@@ -17,10 +17,8 @@ export const MemberTypeIdEnum = new GraphQLEnumType({
   },
 });
 
-export type MemberTypeId = 'BASIC' | 'BUSINESS';
-
 export interface IMember {
-  id: MemberTypeId;
+  id: string;
   discount: number;
   postsLimitPerMonth: number;
 }
