@@ -54,10 +54,11 @@ export const User: GraphQLObjectType<IUser, ContextType> = new GraphQLObjectType
       resolve: async (parent, _args, context) => {
         if (parent.userSubscribedTo && parent.userSubscribedTo?.length) {
           const usersIds = parent.userSubscribedTo.map((user) => user.authorId);
-          const authors = context.dataLoaders.userDL.loadMany(usersIds);
-
+          const authors = await context.dataLoaders.userDL.loadMany(usersIds);
           return authors;
         }
+        const { userSubscribedToDL } = context.dataLoaders;
+        return userSubscribedToDL.load(parent.id);
       },
     },
     subscribedToUser: {
@@ -65,10 +66,11 @@ export const User: GraphQLObjectType<IUser, ContextType> = new GraphQLObjectType
       resolve: async (parent, _args, context) => {
         if (parent.subscribedToUser && parent.subscribedToUser?.length) {
           const usersIds = parent.subscribedToUser.map((user) => user.subscriberId);
-          const subscribers = context.dataLoaders.userDL.loadMany(usersIds);
-
+          const subscribers = await context.dataLoaders.userDL.loadMany(usersIds);
           return subscribers;
         }
+        const { subscribedToUserDL } = context.dataLoaders;
+        return subscribedToUserDL.load(parent.id);
       },
     },
   }),

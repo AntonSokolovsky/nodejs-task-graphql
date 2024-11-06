@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, User } from '@prisma/client';
 import DataLoader from 'dataloader';
 import { IMember } from './types/member.js';
 import { IUser } from './types/user.js';
@@ -24,8 +24,8 @@ export const userDL = (prisma: PrismaClient) => {
       where: { id: { in: ids as string[] } },
       include: { userSubscribedTo: true, subscribedToUser: true },
     });
-    const userById = ids.map((id) => users.find((user) => user.id === id));
-    return userById;
+    const usersByIds = ids.map((id) => users.find((user) => user.id === id));
+    return usersByIds;
   });
   return dl;
 };
@@ -54,12 +54,57 @@ export const profileDL = (prisma: PrismaClient) => {
   return dl;
 };
 
+export const userSubscribedToDL = (prisma: PrismaClient) => {
+  const dl = new DataLoader(async (ids: Readonly<string[]>) => {
+    const userSubscriptions = await prisma.subscribersOnAuthors.findMany({
+      where: {
+        subscriberId: { in: ids as string[] },
+      },
+      include: { author: true },
+    });
+
+    const userSubscriptionsById = ids.map((id) =>
+      userSubscriptions
+        .filter((subscription) => subscription.subscriberId === id)
+        .map((subscription) => subscription.author),
+    );
+
+    return userSubscriptionsById;
+  });
+
+  return dl;
+};
+
+export const subscribedToUserDL = (clientDb: PrismaClient) => {
+  const dl = new DataLoader(async (ids: Readonly<string[]>) => {
+    const followers = await clientDb.subscribersOnAuthors.findMany({
+      where: {
+        authorId: { in: ids as string[] },
+      },
+      include: { subscriber: true },
+    });
+
+    const followersById = ids.map(
+      (id) =>
+        followers
+          .filter((follower) => follower.authorId === id)
+          .map((follower) => follower.subscriber) || [],
+    );
+
+    return followersById;
+  });
+
+  return dl;
+};
+
 export const getDataLoaders = (prisma: PrismaClient) => {
   return {
     memberTypeDL: memberTypeDL(prisma),
     userDL: userDL(prisma),
     postDL: postDL(prisma),
     profileDL: profileDL(prisma),
+    userSubscribedToDL: userSubscribedToDL(prisma),
+    subscribedToUserDL: subscribedToUserDL(prisma),
   };
 };
 
@@ -72,5 +117,7 @@ export type ContextType = {
     userDL: DataLoaderType<IUser>;
     postDL: DataLoaderType<IPost>;
     profileDL: DataLoaderType<IProfile>;
+    userSubscribedToDL: DataLoaderType<User>;
+    subscribedToUserDL: DataLoaderType<User>;
   };
 };

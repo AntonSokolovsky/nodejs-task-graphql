@@ -33,7 +33,7 @@ export const MemberType: GraphQLObjectType<IMember, ContextType> = new GraphQLOb
       type: new GraphQLList(Profile),
       resolve: async (parent, _args, { prisma }: ContextType) => {
         return await prisma.profile.findMany({
-          where: { memberTypeId: parent?.id },
+          where: { memberTypeId: parent.id },
         });
       },
     },

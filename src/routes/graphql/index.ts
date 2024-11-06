@@ -21,13 +21,14 @@ const plugin: FastifyPluginAsyncTypebox = async (fastify) => {
       const { query, variables } = req.body;
       const validationErrors = validate(schema, parse(query), [depthLimit(5)]);
 
-      if (validationErrors?.length) {
+      if (validationErrors && validationErrors.length > 0) {
         return { errors: validationErrors };
       }
       const context = {
         prisma: fastify.prisma,
-        dataloaders: getDataLoaders(fastify.prisma),
+        dataLoaders: getDataLoaders(fastify.prisma),
       };
+
       const response = await graphql({
         schema: schema,
         source: query,

@@ -13,7 +13,7 @@ import {
   Profile,
 } from './types/profile.js';
 import { ChangePostInput, CreatePostInput, PostInput, Post } from './types/post.js';
-import { ContextType, userDL } from './dataLoader.js';
+import { ContextType } from './dataLoader.js';
 
 export const mutation = new GraphQLObjectType({
   name: 'Mutation',
