@@ -6,8 +6,8 @@ import {
   GraphQLNonNull,
   GraphQLObjectType,
 } from 'graphql';
-import { PrismaClient } from '@prisma/client';
 import { Profile } from './profile.js';
+import { ContextType } from '../dataLoader.js';
 
 export const MemberTypeIdEnum = new GraphQLEnumType({
   name: 'MemberTypeId',
@@ -17,24 +17,24 @@ export const MemberTypeIdEnum = new GraphQLEnumType({
   },
 });
 
-export type MemberTypeId = 'BASIC' | 'BUSINESS';
-
 export interface IMember {
-  id: MemberTypeId;
+  id: string;
   discount: number;
   postsLimitPerMonth: number;
 }
 
-export const MemberType = new GraphQLObjectType({
+export const MemberType: GraphQLObjectType<IMember, ContextType> = new GraphQLObjectType({
   name: 'Member',
   fields: () => ({
     id: { type: new GraphQLNonNull(MemberTypeIdEnum) },
-    discount: { type: new GraphQLNonNull(GraphQLFloat) },
-    postsLimitPerMonth: { type: new GraphQLNonNull(GraphQLInt) },
+    discount: { type: GraphQLFloat },
+    postsLimitPerMonth: { type: GraphQLInt },
     profiles: {
       type: new GraphQLList(Profile),
-      resolve: async (source: IMember, _args, { prisma }: { prisma: PrismaClient }) => {
-        return await prisma.profile.findMany({ where: { memberTypeId: source.id } });
+      resolve: async (parent, _args, { prisma }: ContextType) => {
+        return await prisma.profile.findMany({
+          where: { memberTypeId: parent.id },
+        });
       },
     },
   }),
